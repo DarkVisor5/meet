@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/DarkVisor5/meet.git/static/css/main.f855e6bc.css",
+    "main.js": "/DarkVisor5/meet.git/static/js/main.2fdd79b6.js",
+    "static/js/787.0f140951.chunk.js": "/DarkVisor5/meet.git/static/js/787.0f140951.chunk.js",
+    "service-worker.js": "/DarkVisor5/meet.git/service-worker.js",
+    "static/media/logo.svg": "/DarkVisor5/meet.git/static/media/logo.103b5fa18196d5665a7e12318285c916.svg",
+    "index.html": "/DarkVisor5/meet.git/index.html",
+    "main.f855e6bc.css.map": "/DarkVisor5/meet.git/static/css/main.f855e6bc.css.map",
+    "main.2fdd79b6.js.map": "/DarkVisor5/meet.git/static/js/main.2fdd79b6.js.map",
+    "787.0f140951.chunk.js.map": "/DarkVisor5/meet.git/static/js/787.0f140951.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f855e6bc.css",
+    "static/js/main.2fdd79b6.js"
+  ]
+}
