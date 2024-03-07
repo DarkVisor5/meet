@@ -1,24 +1,27 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import CitySearch from './components/CitySearch';
+import EventList from './components/EventList';
+import NumberOfEvents from './components/NumberOfEvents'; // Make sure to import NumberOfEvents
+import { getEvents } from './api';
 import './App.css';
 
-function App() {
+const App = () => {
+  const [events, setEvents] = useState([]);
+  const [numberOfEvents, setNumberOfEvents] = useState(32); // Add state to manage the number of events
+
+  useEffect(() => {
+    getEvents().then(events => setEvents(events.slice(0, numberOfEvents))); // Limit the number of events based on numberOfEvents state
+  }, [numberOfEvents]); // Rerun effect if numberOfEvents changes
+
+  const handleNumberOfEventsChange = (number) => {
+    setNumberOfEvents(number);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <CitySearch />
+      <NumberOfEvents onNumberOfEventsChange={handleNumberOfEventsChange} numberOfEvents={numberOfEvents} />
+      <EventList events={events} /> {/* Pass events as a prop */}
     </div>
   );
 }
