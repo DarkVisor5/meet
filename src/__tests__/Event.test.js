@@ -1,54 +1,53 @@
-// src/__tests__/Event.test.js
-import { render } from '@testing-library/react';
-import userEvent from '@testing-library/user-event'; // Make sure to import userEvent for simulating user interactions
+import { render, fireEvent } from '@testing-library/react';
 import Event from '../components/Event';
-import { getEvents } from '../api';
+
+// Example mock event data
+const mockEvent = {
+    summary: 'Sample Event',
+    start: { dateTime: '2020-05-19T16:00:00+02:00' },
+    location: 'Sample Location'
+};
 
 describe('<Event /> component', () => {
-  let event, EventComponent;
-  
-  beforeAll(async () => {
-    const allEvents = await getEvents(); // Fetches mock event data
-    event = allEvents[0]; // Selects the first event for testing
-    EventComponent = render(<Event event={event} />); // Renders the Event component for the selected event
-  });
-
-  // Tests for displaying event information
-  test('shows the event title', () => {
-    expect(EventComponent.queryByText(event.summary)).toBeInTheDocument();
-  });
-
-  test('shows the event start time', () => {
-    // Assuming 'event.created' is the start time; adjust if necessary
-    expect(EventComponent.queryByText(new Date(event.created).toLocaleString())).toBeInTheDocument();
-  });
-
-  test('shows the event location', () => {
-    expect(EventComponent.queryByText(event.location)).toBeInTheDocument();
-  });
-
-  // Tests for show/hide event details functionality
-  describe('Event details show/hide', () => {
-    let user;
-
-    beforeEach(() => {
-      user = userEvent.setup(); // Sets up userEvent for each test
+    test('renders event summary', () => {
+        const { getByText } = render(<Event event={mockEvent} />);
+        expect(getByText(mockEvent.summary)).toBeInTheDocument();
     });
 
-    test('Event details are shown when show details button is clicked', async () => {
-      const showDetailsButton = EventComponent.queryByText('Show Details'); // Adjust based on your actual button text
-      await user.click(showDetailsButton);
-      const detailElement = EventComponent.queryByText('Event Details Here'); // Placeholder for actual detail text
-      expect(detailElement).toBeInTheDocument();
+    test('renders event start time', () => {
+        const { getByText } = render(<Event event={mockEvent} />);
+        const eventDate = new Date(mockEvent.start.dateTime);
+        const formattedDateTime = eventDate.toLocaleString(); // Adjust this based on how you format dates in your component
+        expect(getByText(`Start Time: ${formattedDateTime}`)).toBeInTheDocument();
     });
 
-    test('Event details are hidden when hide details button is clicked', async () => {
-      const hideDetailsButton = EventComponent.queryByText('Hide Details'); // Adjust based on your actual button text
-      await user.click(hideDetailsButton);
-      const detailElement = EventComponent.queryByText('Event Details Here'); // Placeholder for actual detail text
-      expect(detailElement).not.toBeInTheDocument();
+    test('renders event location', () => {
+        const { getByText } = render(<Event event={mockEvent} />);
+        expect(getByText(`Location: ${mockEvent.location}`)).toBeInTheDocument();
     });
-  });
-  
+    
+    test('renders show details button', () => {
+        const { getByText } = render(<Event event={mockEvent} />);
+        expect(getByText('Show Details')).toBeInTheDocument();
+    });
+
+    test('shows details when "Show Details" button is clicked', () => {
+        const { getByText } = render(<Event event={mockEvent} />);
+        fireEvent.click(getByText('Show Details'));
+        const eventDate = new Date(mockEvent.start.dateTime);
+        const formattedDateTime = eventDate.toLocaleString();
+        expect(getByText(`Start Time: ${formattedDateTime}`)).toBeInTheDocument();
+        expect(getByText(`Location: ${mockEvent.location}`)).toBeInTheDocument();
+    });
+    
+    
+    test('hides details when "Hide Details" button is clicked', () => {
+        const { getByText, queryByText } = render(<Event event={mockEvent} />);
+        
+        fireEvent.click(getByText('Show Details'));
+        fireEvent.click(getByText('Hide Details'));
+        
+        expect(queryByText(`Start Time: ${mockEvent.start.dateTime}`)).not.toBeInTheDocument();
+        expect(queryByText(`Location: ${mockEvent.location}`)).not.toBeInTheDocument();
+    });
 });
-

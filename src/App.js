@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import CitySearch from './components/CitySearch';
 import EventList from './components/EventList';
-import NumberOfEvents from './components/NumberOfEvents'; // Make sure to import NumberOfEvents
+import NumberOfEvents from './components/NumberOfEvents';
 import { getEvents } from './api';
 import './App.css';
 
 const App = () => {
   const [events, setEvents] = useState([]);
-  const [numberOfEvents, setNumberOfEvents] = useState(32); // Add state to manage the number of events
+  const [numberOfEvents, setNumberOfEvents] = useState(32);
 
   useEffect(() => {
-    getEvents().then(events => setEvents(events.slice(0, numberOfEvents))); // Limit the number of events based on numberOfEvents state
-  }, [numberOfEvents]); // Rerun effect if numberOfEvents changes
+    getEvents().then(events => setEvents(events.slice(0, numberOfEvents)));
+  }, [numberOfEvents]);
 
   const handleNumberOfEventsChange = (number) => {
     setNumberOfEvents(number);

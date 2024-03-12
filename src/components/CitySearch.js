@@ -17,7 +17,7 @@ const CitySearch = ({ allLocations }) => {
     setSuggestions(filteredLocations);
   };
 
-  const handleItemClicked = (event) => {
+  const handleItemClicked = (event) =>  {
     const value = event.target.textContent;
     setQuery(value);
     setShowSuggestions(false);
