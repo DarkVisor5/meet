@@ -1,30 +1,23 @@
-import React, { useState } from 'react';
+import { useState } from "react";
 
 const Event = ({ event }) => {
-    const [showDetails, setShowDetails] = useState(false);
-
-    const handleShowHideDetails = () => {
-        setShowDetails(!showDetails);
-    };
-
-    // Convert the dateTime string to a Date object and format it
-    const formattedDateTime = new Date(event.start.dateTime).toLocaleString();
-
-    return (
-        <li>
-            <h2>{event.summary}</h2> {/* Display event title */}
-            <button onClick={handleShowHideDetails}>
-                {showDetails ? 'Hide Details' : 'Show Details'}
-            </button>
-            {showDetails && (
-                <div>
-                    <p>Start Time: {formattedDateTime}</p>
-                    <p>Location: {event.location}</p>
-                </div>
-            )}
-        </li>
-    );
+  const [showDetails, setShowDetails] = useState(false);
+  return (
+    <li className="event" data-testid="event-item">
+      <h2>{event && event.summary}</h2>
+      <p>{event && event.location}</p>
+      <p>{event && (new Date(event.created)).toUTCString()}</p>
+      {showDetails ?
+        <p className="details">{event && event.description}</p> :
+        null
+      }
+      <button className="details-btn" onClick={() => setShowDetails(!showDetails)}>
+        {showDetails ? "hide details" : "show details"}
+      </button>
+    </li>
+  )
 }
+
 
 export default Event;
 
