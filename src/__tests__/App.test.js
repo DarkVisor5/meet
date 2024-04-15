@@ -52,11 +52,12 @@ describe('<App /> integration', () => {
   });
   test('the number of events rendered matches the number of events inputted by the user', async () => {
     const user = userEvent.setup();
-    const { findByTestId, getAllByTestId } = render(<App />);
-    const numberOfEventsInput = await findByTestId('number-of-events');
+    const { findByLabelText, getAllByTestId } = render(<App />);
+    const numberOfEventsInput = await findByLabelText(/Number of Events:/i);
     await user.clear(numberOfEventsInput);
     await user.type(numberOfEventsInput, "10");
     const eventItems = await getAllByTestId('event-item'); 
     expect(eventItems).toHaveLength(10);
   });
+  
 });

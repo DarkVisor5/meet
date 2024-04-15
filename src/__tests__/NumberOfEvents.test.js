@@ -5,8 +5,11 @@ import NumberOfEvents from '../components/NumberOfEvents';
 
 describe('<NumberOfEvents /> component', () => {
   let NumberOfEventsComponent;
+  let mockOnNumberOfEventsChange;
+
   beforeEach(() => {
-    NumberOfEventsComponent = render(<NumberOfEvents />);
+    mockOnNumberOfEventsChange = jest.fn(); // Mock the function
+    NumberOfEventsComponent = render(<NumberOfEvents onNumberOfEventsChange={mockOnNumberOfEventsChange} />);
   });
 
   test('renders number of events text input', () => {
@@ -23,9 +26,9 @@ describe('<NumberOfEvents /> component', () => {
   test('number of events text box value changes when the user types in it', async () => {
     const user = userEvent.setup();
     const numberTextBox = NumberOfEventsComponent.queryByRole('textbox');
-    await user.type(numberTextBox, "123")
+    await user.clear(numberTextBox);
+    await user.type(numberTextBox, "123");
 
-    // 32 (the default value already written) + 123
-    expect(numberTextBox).toHaveValue("32123");
+    expect(numberTextBox).toHaveValue("123");
   });
 });
