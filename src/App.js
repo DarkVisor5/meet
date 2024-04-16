@@ -12,7 +12,6 @@ const App = () => {
   const [events, setEvents] = useState([]);
   const [currentCity, setCurrentCity] = useState("See all cities");
 
-  // Combined useEffect to handle both dependencies: currentCity and currentNOE
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -29,7 +28,7 @@ const App = () => {
     };
   
     fetchData();
-  }, [currentCity, currentNOE]); // useEffect depends on both currentCity and currentNOE
+  }, [currentCity, currentNOE]);
 
   return (
     <div className="App">
@@ -41,4 +40,8 @@ const App = () => {
 }
 
 export default App;
+
+
+
+
 

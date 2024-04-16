@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from 'react';
 
 const Event = ({ event }) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -25,4 +25,5 @@ const Event = ({ event }) => {
 };
 
 export default Event;
+
 
