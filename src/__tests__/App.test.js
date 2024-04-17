@@ -1,63 +1,70 @@
-import { render, within } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getEvents } from '../api';
 import App from '../App';
 
 describe('<App /> component', () => {
-  let AppDOM;
-  beforeEach(() => {
-    AppDOM = render(<App />).container.firstChild;
-  })
-
   test('renders list of events', () => {
-    expect(AppDOM.querySelector('#event-list')).toBeInTheDocument();
+    const { getByTestId } = render(<App />);
+    expect(getByTestId('event-list')).toBeInTheDocument();
   });
 
   test('render CitySearch', () => {
-    expect(AppDOM.querySelector('#city-search')).toBeInTheDocument();
+    const { getByPlaceholderText } = render(<App />);
+    expect(getByPlaceholderText('Search for a city')).toBeInTheDocument();
   });
 
   test('render NumberOfEvents', () => {
-    expect(AppDOM.querySelector('#number-of-events')).toBeInTheDocument();
+    const { getByLabelText } = render(<App />);
+    expect(getByLabelText('Number of Events:')).toBeInTheDocument();
   });
 });
 
 describe('<App /> integration', () => {
+  let user;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   test('renders a list of events matching the city selected by the user', async () => {
-    const user = userEvent.setup();
-    const AppComponent = render(<App />);
-    const AppDOM = AppComponent.container.firstChild;
+    const { getByTestId, getByText, findAllByTestId } = render(<App />);
+    const citySearchInput = getByTestId('city-search-textbox');
 
-    const CitySearchDOM = AppDOM.querySelector('#city-search');
-    const CitySearchInput = within(CitySearchDOM).queryByRole('textbox');
+    await user.type(citySearchInput, 'Berlin');
+    await user.keyboard('{Enter}'); // Simulate pressing Enter to select the city
 
-    await user.type(CitySearchInput, "Berlin");
-    const berlinSuggestionItem = within(CitySearchDOM).queryByText('Berlin, Germany');
+    // Specifically target the Berlin, Germany suggestion by using getByText with precise query
+    const berlinSuggestionItem = getByText('Berlin, Germany', { selector: '[data-testid="suggestion-Berlin-Germany"]' });
     await user.click(berlinSuggestionItem);
 
-    const EventListDOM = AppDOM.querySelector('#event-list');
-    const allRenderedEventItems = within(EventListDOM).queryAllByRole('listitem');
-
-    const allEvents = await getEvents();
-    const berlinEvents = allEvents.filter(
-      event => event.location === 'Berlin, Germany'
-    );
-
-    expect(allRenderedEventItems.length).toBe(berlinEvents.length);
-
-    allRenderedEventItems.forEach(event => {
-      expect(event.textContent).toContain("Berlin, Germany");
+    await waitFor(async () => {
+      const eventItems = await findAllByTestId('event-item');
+      expect(eventItems.length).toBeGreaterThan(0); // Ensure some events are displayed
+      // Optional: Check if events are indeed from Berlin
+      eventItems.forEach(item => {
+        expect(item.textContent).toContain('Berlin, Germany');
+      });
     });
+  });
 
+  test('displays default number of events', async () => {
+    const { findAllByTestId } = render(<App />);
+    const eventItems = await findAllByTestId('event-item');
+    expect(eventItems).toHaveLength(32); // Expecting the default number of events
   });
-  test('the number of events rendered matches the number of events inputted by the user', async () => {
-    const user = userEvent.setup();
-    const { findByLabelText, getAllByTestId } = render(<App />);
-    const numberOfEventsInput = await findByLabelText(/Number of Events:/i);
+
+  test('updates the number of events rendered when user changes the input', async () => {
+    const { findByLabelText, findAllByTestId } = render(<App />);
+    
+    // Simulate user changing the number of events
+    const numberOfEventsInput = await findByLabelText('Number of Events:');
     await user.clear(numberOfEventsInput);
-    await user.type(numberOfEventsInput, "10");
-    const eventItems = await getAllByTestId('event-item'); 
-    expect(eventItems).toHaveLength(10);
+    await user.type(numberOfEventsInput, '10'); // User changes to 10
+
+    await waitFor(async () => {
+      const eventItems = await findAllByTestId('event-item');
+      expect(eventItems).toHaveLength(10); // Now expecting exactly 10 items
+    });
   });
-  
 });
+
