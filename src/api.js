@@ -58,7 +58,15 @@ export const getAccessToken = async () => {
 };
 
 // Updated getEvents function
+// Updated getEvents function with offline support
 export const getEvents = async () => {
+  // Check network status
+  if (!navigator.onLine) {
+    const storedEvents = localStorage.getItem("lastEvents");
+    return storedEvents ? JSON.parse(storedEvents) : [];
+  }
+
+  // Existing code for online mode:
   // Mock data for localhost
   if (window.location.href.startsWith("http://localhost")) {
     // Ensure mockData is treated as an array
@@ -78,8 +86,15 @@ export const getEvents = async () => {
     const url = `https://ewtzdk5hid.execute-api.eu-central-1.amazonaws.com/dev/api/get-events/${token}`; // Ensure this matches your actual endpoint structure
     const response = await fetch(url);
     const result = await response.json();
-    // Check if 'events' in result is an array and return it, otherwise return an empty array
-    return Array.isArray(result.events) ? result.events : [];
+    if (result && result.events) {
+      // Save the events to localStorage for offline use
+      localStorage.setItem("lastEvents", JSON.stringify(result.events));
+      // Check if 'events' in result is an array and return it
+      return Array.isArray(result.events) ? result.events : [];
+    } else {
+      // Return an empty array if no events found
+      return [];
+    }
   } catch (error) {
     console.error("Error fetching events:", error);
     // Return an empty array in case of any errors during fetch
