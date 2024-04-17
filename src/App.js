@@ -3,7 +3,8 @@ import CitySearch from './components/CitySearch';
 import EventList from './components/EventList';
 import NumberOfEvents from './components/NumberOfEvents';
 import { extractLocations, getEvents } from './api';
-import { InfoAlert, ErrorAlert } from './components/Alert'; // Assuming ErrorAlert is implemented
+import { InfoAlert, ErrorAlert, WarningAlert } from './components/Alert';
+
 
 import './App.css';
 
@@ -13,18 +14,20 @@ const App = () => {
   const [events, setEvents] = useState([]);
   const [currentCity, setCurrentCity] = useState("See all cities");
   const [infoAlert, setInfoAlert] = useState("");
-  const [errorText, setErrorText] = useState(""); // State for error messages
+  const [errorText, setErrorText] = useState("");
+  const [warningAlert, setWarningAlert] = useState('');
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const allEvents = await getEvents();
         if (!Array.isArray(allEvents)) throw new Error("Error fetching events");
-        
+  
         const filteredEvents = currentCity === "See all cities" ?
           allEvents.slice(0, currentNOE) :
           allEvents.filter(event => event.location === currentCity).slice(0, currentNOE);
-
+  
         setEvents(filteredEvents);
         setAllLocations(extractLocations(allEvents));
       } catch (error) {
@@ -33,22 +36,30 @@ const App = () => {
       }
     };
   
+    if (!navigator.onLine) {
+      setWarningAlert('You are offline. The data has been loaded from cache and may not be up to date.');
+    } else {
+      setWarningAlert('');
+    }
+  
     fetchData();
-  }, [currentCity, currentNOE]); // Dependency array includes currentNOE to re-fetch when it changes
+  }, [currentCity, currentNOE]); // Dependency array includes currentNOE and currentCity to re-fetch when they change
+  
 
   return (
     <div className="App">
-        <div className="alerts-container">
-          {infoAlert && <InfoAlert text={infoAlert} />}
-          {errorText && <ErrorAlert text={errorText} />}
-        </div>
-        <CitySearch 
-          allLocations={allLocations} 
-          setCurrentCity={setCurrentCity} 
-          setInfoAlert={setInfoAlert} />
-        <NumberOfEvents onNumberOfEventsChange={setCurrentNOE} setErrorText={setErrorText} />
-        <EventList events={events} />
+    <div className="alerts-container">
+      {infoAlert && <InfoAlert text={infoAlert} />}
+      {errorText && <ErrorAlert text={errorText} />}
+      {warningAlert && <WarningAlert text={warningAlert} />}
     </div>
+    <CitySearch 
+      allLocations={allLocations} 
+      setCurrentCity={setCurrentCity} 
+      setInfoAlert={setInfoAlert} />
+    <NumberOfEvents onNumberOfEventsChange={setCurrentNOE} setErrorText={setErrorText} />
+    <EventList events={events} />
+</div>
   );
 }
 
