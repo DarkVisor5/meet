@@ -3,6 +3,7 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
+import ResizeObserver from 'resize-observer-polyfill';
 
 const MESSAGES_TO_IGNORE = [
     "When testing, code that causes React state updates should be wrapped into act(...):",
@@ -16,3 +17,5 @@ console.error = (...args) => {
     const ignoreMessage = MESSAGES_TO_IGNORE.find(message => args.toString().includes(message));
     if (!ignoreMessage) originalError(...args);
 }
+
+global.ResizeObserver = ResizeObserver;
